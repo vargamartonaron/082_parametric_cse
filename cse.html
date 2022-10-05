@@ -94,9 +94,9 @@ var fullscreen_trial = {
     }
 
 
-var test_stimuli = ["asd", "asd2"]
+var test_stimuli = []
 
-/*function stimuli_reroll(){
+function stimuli_reroll(){
   stimulus_set = []
   test_stimuli = []
   set_factory(5)
@@ -105,14 +105,13 @@ for (i = 0; i < stimulus_set.length; i+=1) { //unwrapping nested array to access
 }
 }
 
-stimuli_reroll()*/
+stimuli_reroll()
 
 var trial_index = 0;
 
      var test = {
       type: jsPsychHtmlKeyboardResponse,
-      stimulus: function() {
-      return test_stimuli[trial_index]},
+      stimulus:jsPsych.timelineVariable("test_stimuli"),
       choices: ["1","2","8","9"],
       trial_duration: 1500,
       response_ends_trial: false,
@@ -169,9 +168,14 @@ var fixation = {
   response_ends_trial: false,
 }
 
-  
+var procedure= {
+    timeline:[fixation, test, feedback],
+    timeline_variables:test_stimuli
 
-timeline.push(loop)
+    
+} 
+
+timeline.push(procedure)
 
     jsPsych.run(timeline)
       
