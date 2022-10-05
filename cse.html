@@ -99,7 +99,7 @@ var test_stimuli = []
 function stimuli_reroll(){
   stimulus_set = []
   test_stimuli = []
-  set_factory(5)
+  set_factory(6)
 for (i = 0; i < stimulus_set.length; i+=1) { //unwrapping nested array to access wanted stimuli (strc of stimulus_set: [(Array(3)), (Array(3)), etc...], strc of new array: {stimulus: 'NNNNN', congruency: 'no_conflict', correct_response: '8'}
   test_stimuli.push({stimulus : stimulus_set[i][0], congruency : stimulus_set[i][1], correct_response : stimulus_set[i][2]})
 }
@@ -111,7 +111,7 @@ var trial_index = 0;
 
      var test = {
       type: jsPsychHtmlKeyboardResponse,
-      stimulus:jsPsych.timelineVariable("test_stimuli"),
+      stimulus: jsPsych.timelineVariable("stimulus"),
       choices: ["1","2","8","9"],
       trial_duration: 1500,
       response_ends_trial: false,
@@ -169,10 +169,8 @@ var fixation = {
 }
 
 var procedure= {
-    timeline:[fixation, test, feedback],
-    timeline_variables:test_stimuli
-
-    
+    timeline: [fixation, test, feedback],
+    timeline_variables: test_stimuli
 } 
 
 timeline.push(procedure)
