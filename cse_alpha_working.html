@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>082_parametric_cse</title>
+    <script src="jspsych/dist/jspsych.js"></script>
+    <script src="jspsych/dist/plugin-html-keyboard-response.js"></script>
+    <script src="jspsych/dist/plugin-fullscreen.js"></script>
+    <script src="jspsych/dist/plugin-instructions.js"></script>
+    <script src ="jspsych/dist/plugin-call-function.js"></script>
+    <link href="jspsych/dist/jspsych.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body></body>
+  <script> 
+//------This script generates a random order of stimuli with the rules of the predefined methods-----
+stimulus_set = []
+
+var relay = 0
+
+const fp_con_list = [
+    ["FFFFF", "no_conflict", "1"],
+    ["PPPPP", "no_conflict", "9"]
+]
+const fp_inc_list = [
+    ["FPPPF", "low_conflict", "9"],
+    ["PFFFP", "low_conflict", "1"],
+    ["FFPFF", "high_conflict", "9"],
+    ["PPFPP", "high_conflict", "1"]
+]
+const hn_con_list = [
+    ["HHHHH", "no_conflict", "2"],
+    ["NNNNN", "no_conflict", "8"]
+]
+const hn_inc_list = [
+    ["HNNNH", "low_conflict", "8"],
+    ["NHHHN", "low_conflict", "2"],
+    ["HHNHH", "high_conflict", "8"],
+    ["NNHNN", "high_conflict", "2"]
+]
+
+const fp_group = [fp_con_list, fp_inc_list]
+const hn_group = [hn_con_list, hn_inc_list]
+
+function stimulus_finder(group) {
+    congruency = Math.floor(Math.random() * group.length) //randomly choosing from congruent or incongruent stimuli (50-50%)
+    stimulus = Math.floor(Math.random() * group.length) // randomly choosing a stimulus from the list (25% low conflict, 25% high conflict, 50% no conflict)
+    stimulus_set.push(group[congruency][stimulus])
+}
+
+function group_relay() { // kindergarden way to switch between fp and hn groups
+
+    if (relay === 0) {
+
+        stimulus_finder(fp_group)
+
+        relay = 1
+    } else {
+        stimulus_finder(hn_group)
+
+        relay = 0
+    }
+
+}
+
+function set_factory(total) {
+    for (var i = 0; i <= total; i += 1) {
+        group_relay()
+    }
+}
+var timeline = []
+var jsPsych = initJsPsych({
+      timeline: timeline,
+      on_finish: function () {
+        jsPsych.data.displayData();
+      },
+      override_safe_mode : true
+    })
+
+var fullscreen_trial = {
+      type: jsPsychFullscreen,
+      fullscreen_mode: true
+    }
+
+    var fullscreen_exit_trial = {
+      type: jsPsychFullscreen,
+      fullscreen_mode: false
+    }
+
+    var instruction = {
+      type: jsPsychInstructions,
+      pages: ['<p>Welcome to the experiment.</p><p>This is the first set of instructions.</p><p>Click next to begin.</p>',
+        '<p>This is the second page of instructions.</p>',
+        '<p>This is the final page.</p>'], // to do
+      show_clickable_nav: true
+    }
+
+
+var test_stimuli = []
+
+function stimuli_reroll(){
+  stimulus_set = []
+  test_stimuli = []
+  set_factory(6)
+for (i = 0; i < stimulus_set.length; i+=1) { //unwrapping nested array to access wanted stimuli (strc of stimulus_set: [(Array(3)), (Array(3)), etc...], strc of new array: {stimulus: 'NNNNN', congruency: 'no_conflict', correct_response: '8'}
+  test_stimuli.push({stimulus : stimulus_set[i][0], congruency : stimulus_set[i][1], correct_response : stimulus_set[i][2]})
+}
+}
+
+stimuli_reroll()
+
+var trial_index = 0;
+
+     var test = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: jsPsych.timelineVariable("stimulus"),
+      choices: ["1","2","8","9"],
+      trial_duration: 1500,
+      response_ends_trial: false,
+      data: {
+        task: "response",
+        correct_response: jsPsych.timelineVariable("correct_response"),
+        congruency: jsPsych.timelineVariable("congruency")
+    
+
+      },
+      on_finish: function (data) {
+        data.correct = jsPsych.pluginAPI.compareKeys(data.response, data.correct_response);
+      }, 
+  }
+
+  var loop = {
+  timeline: [fixation, test, feedback],
+  loop_function: function(data) {
+    trial_index++;
+    // check if we've reached the last trial in test_stimuli
+    if (trial_index == test_stimuli.length) {
+      return false;// logic here to modify the test_stimuli array or stop the loop 
+    } else {
+      return true; 
+    }
+  }
+}
+
+var fixation = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: '<div style="font-size:60px; color: gray;">+</div>',
+    choices: "NO_KEYS",
+    trial_duration: 500,
+    response_ends_trial: false,
+    data: {
+      task: 'fixation'
+    },
+    save_trial_parameters: {
+      stimulus: false
+    }
+  }
+
+  var feedback = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: function(){
+    var last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
+    if(last_trial_correct){
+      return "<p></p>"; 
+    } else {
+      return "<p>Incorrect / No response detected</p>";
+    }
+  },
+  trial_duration: 800,
+  response_ends_trial: false,
+}
+
+var procedure= {
+    timeline: [fixation, test, feedback],
+    timeline_variables: test_stimuli
+} 
+
+timeline.push(procedure)
+
+    jsPsych.run(timeline)
+      
+    
+
+  
+
+
+
+
+      
+    
+      
+    
+
+
+
+    
+
+  </script>
+</html>
