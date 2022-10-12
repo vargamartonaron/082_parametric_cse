@@ -12,8 +12,10 @@
   </head>
   <body></body>
   <script> 
+
 //------This script generates a random order of stimuli with the rules of the predefined methods-----
-stimulus_set = []
+
+var stimulus_set = []
 
 var relay = 0
 
@@ -78,23 +80,7 @@ var jsPsych = initJsPsych({
   override_safe_mode : true
 })
 
-var fullscreen_trial = {
-  type: jsPsychFullscreen,
-  fullscreen_mode: true
-}
-
-var fullscreen_exit_trial = {
-  type: jsPsychFullscreen,
-  fullscreen_mode: false
-}
-
-var instruction = {
-  type: jsPsychInstructions,
-  pages: ['<p>Welcome to the experiment.</p><p>This is the first set of instructions.</p><p>Click next to begin.</p>',
-        '<p>This is the second page of instructions.</p>',
-        '<p>This is the final page.</p>'], // to do
-  show_clickable_nav: true
-}
+//defining stimuli arrays-----------------------------------
 
 var test_stimuli_1 = []
 var test_stimuli_2 = []
@@ -102,6 +88,8 @@ var test_stimuli_3 = []
 var test_stimuli_4 = []
 var test_stimuli_5 = []
 var test_stimuli_6 = []
+
+//function to fill up stimuli arrays randomly------------------------
 
 function stimuli_reroll(array){
   stimulus_set = []
@@ -120,6 +108,24 @@ stimuli_reroll(test_stimuli_3)
 stimuli_reroll(test_stimuli_4)
 stimuli_reroll(test_stimuli_5)
 stimuli_reroll(test_stimuli_6)
+
+var fullscreen_trial = {
+  type: jsPsychFullscreen,
+  fullscreen_mode: true
+}
+
+var fullscreen_exit_trial = {
+  type: jsPsychFullscreen,
+  fullscreen_mode: false
+}
+
+var instruction = {
+  type: jsPsychInstructions,
+  pages: ['<p>Welcome to the experiment.</p><p>This is the first set of instructions.</p><p>Click next to begin.</p>',
+        '<p>This is the second page of instructions.</p>',
+        '<p>This is the final page.</p>'], // to do
+  show_clickable_nav: true
+}
 
 var pause = {
   type: jsPsychHtmlKeyboardResponse,
@@ -141,7 +147,7 @@ var test = {
   on_finish: function (data) {
     data.correct = jsPsych.pluginAPI.compareKeys(data.response, data.correct_response);
   }, 
-  }
+}
   
 
 var fixation = {
@@ -163,7 +169,7 @@ var feedback = {
   stimulus: function() {
     var last_trial_correct = jsPsych.data.get().last(1).values()[0].correct
       if(last_trial_correct){
-      return "<p></p>"; 
+        return "<p></p>"; 
       } else {
         return "<p>Incorrect / No response detected</p>";
       }
@@ -201,6 +207,7 @@ var procedure_6 = {
 
 timeline.push(
   fullscreen_trial,
+  instruction,
   procedure_1,
   pause,
   procedure_2,
