@@ -94,22 +94,32 @@ var fullscreen_trial = {
     }
 
 
-var test_stimuli = []
+var test_stimuli_1 = []
+var test_stimuli_2 = []
+var test_stimuli_3 = []
+var test_stimuli_4 = []
+var test_stimuli_5 = []
+var test_stimuli_6 = []
 
-function stimuli_reroll(){
+function stimuli_reroll(array){
   stimulus_set = []
-  test_stimuli = []
-  set_factory(6)
-for (i = 0; i < stimulus_set.length; i+=1) { //unwrapping nested array to access wanted stimuli (strc of stimulus_set: [(Array(3)), (Array(3)), etc...], strc of new array: {stimulus: 'NNNNN', congruency: 'no_conflict', correct_response: '8'}
-  test_stimuli.push({stimulus : stimulus_set[i][0], congruency : stimulus_set[i][1], correct_response : stimulus_set[i][2]})
+  set_factory(1)
+for (i = 0; i < stimulus_set.length; i+=1) { 
+  //unwrapping nested array to access wanted stimuli (strc of stimulus_set: [(Array(3)), (Array(3)), etc...], strc of new array: {stimulus: 'NNNNN', congruency: 'no_conflict', correct_response: '8'}
+  array.push({stimulus : stimulus_set[i][0], congruency : stimulus_set[i][1], correct_response : stimulus_set[i][2]})
 }
 }
 
-stimuli_reroll()
+stimuli_reroll(test_stimuli_1)
+stimuli_reroll(test_stimuli_2)
+stimuli_reroll(test_stimuli_3)
+stimuli_reroll(test_stimuli_4)
+stimuli_reroll(test_stimuli_5)
+stimuli_reroll(test_stimuli_6)
 
 var trial_index = 0;
-
-     var test = {
+      
+var test = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: jsPsych.timelineVariable("stimulus"),
       choices: ["1","2","8","9"],
@@ -126,14 +136,14 @@ var trial_index = 0;
         data.correct = jsPsych.pluginAPI.compareKeys(data.response, data.correct_response);
       }, 
   }
-
+  
   var loop = {
   timeline: [fixation, test, feedback],
   loop_function: function(data) {
     trial_index++;
-    // check if we've reached the last trial in test_stimuli
-    if (trial_index == test_stimuli.length) {
-      return false;// logic here to modify the test_stimuli array or stop the loop 
+    // check if we've reached the last trial in test_stimuli_1
+    if (trial_index == test_stimuli_1.length) {
+      return false;// logic here to modify the test_stimuli_1 array or stop the loop 
     } else {
       return true; 
     }
@@ -168,14 +178,41 @@ var fixation = {
   response_ends_trial: false,
 }
 
-var procedure= {
+var procedure_1 = {
     timeline: [fixation, test, feedback],
-    timeline_variables: test_stimuli
+    timeline_variables: test_stimuli_1
+} 
+var procedure_2 = {
+    timeline: [fixation, test, feedback],
+    timeline_variables: test_stimuli_2
+} 
+var procedure_3 = {
+    timeline: [fixation, test, feedback],
+    timeline_variables: test_stimuli_3
+} 
+var procedure_4 = {
+    timeline: [fixation, test, feedback],
+    timeline_variables: test_stimuli_4
+} 
+var procedure_5 = {
+    timeline: [fixation, test, feedback],
+    timeline_variables: test_stimuli_5
+} 
+var procedure_6 = {
+    timeline: [fixation, test, feedback],
+    timeline_variables: test_stimuli_6
 } 
 
-timeline.push(procedure)
+timeline.push(
+  procedure_1,
+  procedure_2,
+  procedure_3,
+  procedure_4,
+  procedure_5,
+  procedure_6
+)
 
-    jsPsych.run(timeline)
+jsPsych.run(timeline)
       
     
 
