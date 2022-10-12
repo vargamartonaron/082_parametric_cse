@@ -66,7 +66,9 @@ function set_factory(total) {
         group_relay()
     }
 }
+// -------------------JsPsych-------------------------------------------------------------------------------------------
 var timeline = []
+
 var jsPsych = initJsPsych({
       timeline: timeline,
       on_finish: function () {
@@ -85,12 +87,12 @@ var fullscreen_trial = {
       fullscreen_mode: false
     }
 
-    var instruction = {
-      type: jsPsychInstructions,
-      pages: ['<p>Welcome to the experiment.</p><p>This is the first set of instructions.</p><p>Click next to begin.</p>',
+var instruction = {
+  type: jsPsychInstructions,
+  pages: ['<p>Welcome to the experiment.</p><p>This is the first set of instructions.</p><p>Click next to begin.</p>',
         '<p>This is the second page of instructions.</p>',
         '<p>This is the final page.</p>'], // to do
-      show_clickable_nav: true
+  show_clickable_nav: true
     }
 
 
@@ -104,9 +106,11 @@ var test_stimuli_6 = []
 function stimuli_reroll(array){
   stimulus_set = []
   set_factory(1)
-for (i = 0; i < stimulus_set.length; i+=1) { 
-  //unwrapping nested array to access wanted stimuli (strc of stimulus_set: [(Array(3)), (Array(3)), etc...], strc of new array: {stimulus: 'NNNNN', congruency: 'no_conflict', correct_response: '8'}
-  array.push({stimulus : stimulus_set[i][0], congruency : stimulus_set[i][1], correct_response : stimulus_set[i][2]})
+
+  for (i = 0; i < stimulus_set.length; i+=1) { 
+  //unwrapping nested array to access wanted stimuli (strc of stimulus_set: [(Array(3)), (Array(3)), etc...],
+  //strc of new array: {stimulus: 'NNNNN', congruency: 'no_conflict', correct_response: '8'}
+   array.push({stimulus : stimulus_set[i][0], congruency : stimulus_set[i][1], correct_response : stimulus_set[i][2]})
 }
 }
 
@@ -116,58 +120,42 @@ stimuli_reroll(test_stimuli_3)
 stimuli_reroll(test_stimuli_4)
 stimuli_reroll(test_stimuli_5)
 stimuli_reroll(test_stimuli_6)
-
-var trial_index = 0;
       
 var test = {
-      type: jsPsychHtmlKeyboardResponse,
-      stimulus: jsPsych.timelineVariable("stimulus"),
-      choices: ["1","2","8","9"],
-      trial_duration: 1500,
-      response_ends_trial: false,
-      data: {
-        task: "response",
-        correct_response: jsPsych.timelineVariable("correct_response"),
-        congruency: jsPsych.timelineVariable("congruency")
-    
-
-      },
-      on_finish: function (data) {
-        data.correct = jsPsych.pluginAPI.compareKeys(data.response, data.correct_response);
-      }, 
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: jsPsych.timelineVariable("stimulus"),
+  choices: ["1","2","8","9"],
+  trial_duration: 1500,
+  response_ends_trial: false,
+  data: {
+    task: "response",
+    correct_response: jsPsych.timelineVariable("correct_response"),
+    congruency: jsPsych.timelineVariable("congruency")
+  },
+  on_finish: function (data) {
+    data.correct = jsPsych.pluginAPI.compareKeys(data.response, data.correct_response);
+  }, 
   }
   
-  var loop = {
-  timeline: [fixation, test, feedback],
-  loop_function: function(data) {
-    trial_index++;
-    // check if we've reached the last trial in test_stimuli_1
-    if (trial_index == test_stimuli_1.length) {
-      return false;// logic here to modify the test_stimuli_1 array or stop the loop 
-    } else {
-      return true; 
-    }
-  }
-}
 
 var fixation = {
-    type: jsPsychHtmlKeyboardResponse,
-    stimulus: '<div style="font-size:60px; color: gray;">+</div>',
-    choices: "NO_KEYS",
-    trial_duration: 500,
-    response_ends_trial: false,
-    data: {
-      task: 'fixation'
-    },
-    save_trial_parameters: {
-      stimulus: false
-    }
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: '<div style="font-size:60px; color: gray;">+</div>',
+  choices: "NO_KEYS",
+  trial_duration: 500,
+  response_ends_trial: false,
+  data: {
+    task: 'fixation'
+  },
+  save_trial_parameters: {
+    stimulus: false
+  }
   }
 
   var feedback = {
-  type: jsPsychHtmlKeyboardResponse,
-  stimulus: function(){
-    var last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: function() {
+      var last_trial_correct = jsPsych.data.get().last(1).values()[0].correct
     if(last_trial_correct){
       return "<p></p>"; 
     } else {
@@ -204,12 +192,14 @@ var procedure_6 = {
 } 
 
 timeline.push(
+  fullscreen_trial,
   procedure_1,
   procedure_2,
   procedure_3,
   procedure_4,
   procedure_5,
-  procedure_6
+  procedure_6,
+  fullscreen_exit_trial
 )
 
 jsPsych.run(timeline)
