@@ -6,7 +6,8 @@
     <script src="jspsych/dist/plugin-html-keyboard-response.js"></script>
     <script src="jspsych/dist/plugin-fullscreen.js"></script>
     <script src="jspsych/dist/plugin-instructions.js"></script>
-    <script src ="jspsych/dist/plugin-call-function.js"></script>
+    <script src="jspsych/dist/plugin-call-function.js"></script>
+    <script src="jspsych/dist/plugin-html-keyboard-response.js"></script>
     <link href="jspsych/dist/jspsych.css" rel="stylesheet" type="text/css" />
   </head>
   <body></body>
@@ -70,22 +71,22 @@ function set_factory(total) {
 var timeline = []
 
 var jsPsych = initJsPsych({
-      timeline: timeline,
-      on_finish: function () {
-        jsPsych.data.displayData();
-      },
-      override_safe_mode : true
-    })
+  timeline: timeline,
+  on_finish: function () {
+    jsPsych.data.displayData();
+  },
+  override_safe_mode : true
+})
 
 var fullscreen_trial = {
-      type: jsPsychFullscreen,
-      fullscreen_mode: true
-    }
+  type: jsPsychFullscreen,
+  fullscreen_mode: true
+}
 
-    var fullscreen_exit_trial = {
-      type: jsPsychFullscreen,
-      fullscreen_mode: false
-    }
+var fullscreen_exit_trial = {
+  type: jsPsychFullscreen,
+  fullscreen_mode: false
+}
 
 var instruction = {
   type: jsPsychInstructions,
@@ -93,8 +94,7 @@ var instruction = {
         '<p>This is the second page of instructions.</p>',
         '<p>This is the final page.</p>'], // to do
   show_clickable_nav: true
-    }
-
+}
 
 var test_stimuli_1 = []
 var test_stimuli_2 = []
@@ -120,7 +120,13 @@ stimuli_reroll(test_stimuli_3)
 stimuli_reroll(test_stimuli_4)
 stimuli_reroll(test_stimuli_5)
 stimuli_reroll(test_stimuli_6)
-      
+
+var pause = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: 'You have reached the end of this block. Press any key to continue!',
+  post_trial_gap: 0,
+}
+
 var test = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: jsPsych.timelineVariable("stimulus"),
@@ -150,75 +156,67 @@ var fixation = {
   save_trial_parameters: {
     stimulus: false
   }
-  }
+}
 
-  var feedback = {
-    type: jsPsychHtmlKeyboardResponse,
-    stimulus: function() {
-      var last_trial_correct = jsPsych.data.get().last(1).values()[0].correct
-    if(last_trial_correct){
+var feedback = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: function() {
+    var last_trial_correct = jsPsych.data.get().last(1).values()[0].correct
+      if(last_trial_correct){
       return "<p></p>"; 
-    } else {
-      return "<p>Incorrect / No response detected</p>";
-    }
+      } else {
+        return "<p>Incorrect / No response detected</p>";
+      }
   },
   trial_duration: 800,
   response_ends_trial: false,
 }
 
 var procedure_1 = {
-    timeline: [fixation, test, feedback],
-    timeline_variables: test_stimuli_1
-} 
+  timeline: [fixation, test, feedback],
+  timeline_variables: test_stimuli_1
+}
+
 var procedure_2 = {
-    timeline: [fixation, test, feedback],
-    timeline_variables: test_stimuli_2
-} 
+  timeline: [fixation, test, feedback],
+  timeline_variables: test_stimuli_2
+}
+
 var procedure_3 = {
-    timeline: [fixation, test, feedback],
-    timeline_variables: test_stimuli_3
+  timeline: [fixation, test, feedback],
+  timeline_variables: test_stimuli_3
 } 
 var procedure_4 = {
-    timeline: [fixation, test, feedback],
-    timeline_variables: test_stimuli_4
+  timeline: [fixation, test, feedback],
+  timeline_variables: test_stimuli_4
 } 
 var procedure_5 = {
-    timeline: [fixation, test, feedback],
-    timeline_variables: test_stimuli_5
+  timeline: [fixation, test, feedback],
+  timeline_variables: test_stimuli_5
 } 
 var procedure_6 = {
-    timeline: [fixation, test, feedback],
-    timeline_variables: test_stimuli_6
+  timeline: [fixation, test, feedback],
+  timeline_variables: test_stimuli_6
 } 
 
 timeline.push(
   fullscreen_trial,
   procedure_1,
+  pause,
   procedure_2,
+  pause,
   procedure_3,
+  pause,
   procedure_4,
+  pause,
   procedure_5,
+  pause,
   procedure_6,
+  pause,
   fullscreen_exit_trial
 )
 
 jsPsych.run(timeline)
-      
-    
-
-  
-
-
-
-
-      
-    
-      
-    
-
-
-
-    
 
   </script>
 </html>
