@@ -61,7 +61,7 @@ function stimuli_reroll(){
   stimulus_set = []
   test_stimuli = []
   test_stimuli_6 = []
-  set_factory(1)
+  set_factory(20)
 for (i = 0; i < stimulus_set.length; i+=1) { //unwrapping nested array to access wanted stimuli (strc of stimulus_set: [(Array(3)), (Array(3)), etc...], strc of new array: {stimulus: 'NNNNN', congruency: 'no_conflict', correct_response: '8'}
   test_stimuli.push({stimulus : stimulus_set[i][0], congruency : stimulus_set[i][1], correct_response : stimulus_set[i][2]})
 }
@@ -71,5 +71,5 @@ for (i = 0; i <= 6; i++) {
 }
 }
 stimuli_reroll()
-
-console.log(test_stimuli[0])
+for(i =0; i<=stimulus_set.length; i+=1){
+    console.log(stimulus_set[i])}
