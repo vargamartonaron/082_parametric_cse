@@ -10,9 +10,13 @@
     <script src="jspsych/dist/plugin-html-keyboard-response.js"></script>
     <script src="jspsych/dist/plugin-html-button-response.js"></script>
     <script src="jspsych/dist/plugin-survey-text.js"></script>
+    <script src="jspsych/dist/plugin-preload.js"></script>
     <link href="jspsych/dist/jspsych.css" rel="stylesheet" type="text/css" />
+    <link href="css/082_exp_design.css" rel="stylesheet" type="text/css" />
   </head>
-  <body></body>
+  <body>
+    
+  </body>
   <script> 
 
 //------This script generates a random order of stimuli with the rules of the predefined methods-----
@@ -235,6 +239,53 @@ var consentScreen = {
     }
 }
 
+const images = ["images/congruent_stim.png","images/incongruent_stim.png","images/qweertz_bill.png"]
+
+var preload = {
+      type: jsPsychPreload,
+      images: images
+}
+
+const instructionsScreen = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: `
+  <div>
+  <h1>Instrukciók</h1>
+  <p>
+    "<img src='images/congruent_stim.png'></img>"
+  </p>
+  <br>
+  faszgép
+  <br>
+  <p>
+  faszgép2
+  </p>
+  <p>
+    A gyakorlást követően a kísérlet 4 szakaszból fog állni, ezek mindegyike 2 részre ('A' és 'B') oszlik.
+    A 4 szakasz egyenként kb. 8 percet vesz igénybe, közöttük rövid szünetet tarthatsz.
+  </p>
+  <p>
+    Kérünk, hogy a feladatot számítógépen végezd el (ne telefonon, tableten stb.)!
+    Nagyon fontos, hogy a kísérlet során végig tudj összpontosítani, ezért kérünk, hogy ne csinálj semmi mást,
+    miközben a feladatot csinálod! Ha 70% feletti pontossággal oldod meg a feladatot, valamint, ha elvégzed a feladat mindkét részét,
+    akkor 2 pontot kapsz a „Pszichológiai kísérletben és tudományos aktivitásban való részvétel” nevű kurzuson.
+    Ha a megoldásod pontossága 70%-nál alacsonyabb lesz (ami egy ésszerű határ az előző kutatások fényében),
+    illetve ha csak az egyik részt teljesíted, akkor nem kapsz pontot a kitöltésért.
+    Ne felejtsd el megadni a Neptun-kódod a kísérlet elején, hogy beírhassuk a pontjaid!
+  </p>
+  Nyomd meg a Space billentyűt a folytatáshoz!
+  </div>
+  `,
+    choices: [" "],
+    data: {
+      task: 'instructions'
+    },
+    save_trial_parameters: {
+      stimulus: false
+    }
+  
+}
+
 const neptun = {
   type: jsPsychSurveyText,
   questions: [
@@ -283,6 +334,7 @@ var test = {
   on_finish: function (data) {
     data.correct = jsPsych.pluginAPI.compareKeys(data.response, data.correct_response);
   }, 
+  css_classes: ['stim']
 }
   
 
