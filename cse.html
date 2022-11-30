@@ -11,6 +11,7 @@
     <script src="jspsych/dist/plugin-html-button-response.js"></script>
     <script src="jspsych/dist/plugin-survey-text.js"></script>
     <script src="jspsych/dist/plugin-preload.js"></script>
+    <script src="jatos.js"></script>
     <link href="jspsych/dist/jspsych.css" rel="stylesheet" type="text/css" />
     <link href="css/082_exp_design.css" rel="stylesheet" type="text/css" />
   </head>
@@ -81,7 +82,7 @@ var timeline = []
 var jsPsych = initJsPsych({
   timeline: timeline,
   on_finish: function () {
-    jsPsych.data.displayData();
+    () => jatos.endStudy(jsPsych.data.get().json());
   },
   override_safe_mode : true
 })
@@ -410,7 +411,10 @@ timeline.push(
   fullscreen_exit_trial
 )
 
-jsPsych.run(timeline)
+jatos.onLoad(() => {
+  jatos.addAbortButton();
+  jsPsych.run(timeline);
+})
 
   </script>
 </html>
