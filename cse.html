@@ -9,11 +9,14 @@
     <script src="jspsych/dist/plugin-call-function.js"></script>
     <script src="jspsych/dist/plugin-html-keyboard-response.js"></script>
     <script src="jspsych/dist/plugin-html-button-response.js"></script>
-    <script src="jspsych/dist/plugin-survey-text.js"></script>
+    <script src="jspsych/dist/plugin-survey.js"></script>
     <script src="jspsych/dist/plugin-preload.js"></script>
     <script src="jatos.js"></script>
     <link href="jspsych/dist/jspsych.css" rel="stylesheet" type="text/css" />
     <link href="css/082_exp_design.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://unpkg.com/@jspsych/plugin-survey@0.2.0/css/survey.css">
+
+
   </head>
   <body>
     
@@ -82,7 +85,8 @@ var timeline = []
 var jsPsych = initJsPsych({
   timeline: timeline,
   on_finish: function () {
-    () => jatos.endStudy(jsPsych.data.get().json());
+    //jatos.endStudy(jsPsych.data.get().csv());
+    jsPsych.data.displayData();
   },
   override_safe_mode : true
 })
@@ -95,6 +99,7 @@ jsPsych.data.addProperties({
 
 //defining stimuli arrays-----------------------------------
 
+var practice_stimuli = []
 var test_stimuli_1 = []
 var test_stimuli_2 = []
 var test_stimuli_3 = []
@@ -115,6 +120,7 @@ function stimuli_reroll(array){
 }
 }
 
+stimuli_reroll(practice_stimuli)
 stimuli_reroll(test_stimuli_1)
 stimuli_reroll(test_stimuli_2)
 stimuli_reroll(test_stimuli_3)
@@ -268,7 +274,9 @@ const instructionsScreen = {
     akkor 2 pontot kapsz a „Pszichológiai kísérletben és tudományos aktivitásban való részvétel” nevű kurzuson.
     Ha a megoldásod pontossága 70%-nál alacsonyabb lesz (ami egy ésszerű határ az előző kutatások fényében),
     illetve ha csak az egyik részt teljesíted, akkor nem kapsz pontot a kitöltésért.
-    Ne felejtsd el megadni a Neptun-kódod a kísérlet elején, hogy beírhassuk a pontjaid!
+    
+    A teszt egy gyakorló részleggel indul, ahol 85%-os pontossággal kell teljesítened, hogy kitölthesd a tesztet.
+    Amennyiben nem éred el a 85%-ot, a gyakorló blokk mindaddig újraindul, amíg ez a pontossági szint nem valósul meg.
   </p>
   Nyomd meg a Space billentyűt a folytatáshoz!
   </div>
@@ -283,14 +291,50 @@ const instructionsScreen = {
   
 }
 
-const neptun = {
-  type: jsPsychSurveyText,
-  questions: [
-    {prompt: 'Mi a NEPTUN kódod?', placeholder: 'neptun', required: true}
+const neptun_demographics = {
+  type: jsPsychSurvey,
+  pages: [
+    [
+      {
+        type: 'html',
+        prompt: 'Kérlek add meg a NEPTUN kódodat és az alábbi demográfiai adataidat:'
+      },
+      {
+        type: 'text',
+        prompt: 'Mi a NEPTUN kódod?',
+        name: 'neptun',
+        required: true,
+      },
+      {
+        type:'drop-down',
+        prompt: 'Milyen nemű vagy?',
+        options: ["Férfi", "Nő", "Egyéb"],
+        name: 'nem',
+        required: true,
+        dropdown_select_prompt:'Válassz...'
+      },
+      {
+        type: 'text',
+        prompt: 'Mennyi idős vagy?',
+        input_type: 'number',
+        name: 'kor',
+        required: true,
+      },
+      {
+        type: 'drop-down',
+        prompt: 'Mi a legmagasabb iskolai végzettséged?',
+        options: ["befejezett 8. osztály", "érettségi", "emelt szintű szakképesítés (pl. emelt OKJ)", "felsőoktatási alapfokozat (BA/BSc)", "felsőoktatási mesterfokozat (MA/MSc)", "doktori fokozat (PhD/DLA)"],
+        name: 'vegzettseg',
+        required: true,
+        dropdown_select_prompt:'Válassz...'
+      }
+    ]
   ],
+  required_error:'"Kérlek válaszolj az alábbi kérdésre!"',
+  button_label_finish: 'Beküldés',
   data: {
-     task: 'neptun'
-  }
+    task: 'survey'
+  },
 }
 
 var fullscreen_trial = {
@@ -303,18 +347,58 @@ var fullscreen_exit_trial = {
   fullscreen_mode: false
 }
 
-var instruction = {
-  type: jsPsychInstructions,
-  pages: ['<p>Welcome to the experiment.</p><p>This is the first set of instructions.</p><p>Click next to begin.</p>',
-        '<p>This is the second page of instructions.</p>',
-        '<p>This is the final page.</p>'],
-  show_clickable_nav: true
-}
-
 var pause = {
   type: jsPsychHtmlKeyboardResponse,
-  stimulus: 'You have reached the end of this block. Press any key to continue!',
+  stimulus:  `
+  <div>
+  <h1>Blokk vége</h1>
+  <p>
+    A mostani blokk végére értél!
+  </p>
+  <p>
+    Ha szeretnél, nyugodtan tarts egy rövid, 1-2 perces szünetet!
+  </p>
+  <p>
+    Emlékeztető a billentyűkhöz: 1 billentyű -> F, 2 billentyű -> H, 8 billentyű -> N, 9 billentyű -> P.
+  </p>
+  Nyomd meg a Space billentyűt a folytatáshoz!
+  </div>
+  `,
+  choices: [" "],
   post_trial_gap: 0,
+  data: {
+    task: 'pause'
+  },
+  save_trial_parameters: {
+    stimulus: false
+  }
+}
+
+var pause_practice = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus:  `
+  <div>
+  <h1> Gyakorló Blokk vége</h1>
+  <p>
+    A gyakorló blokk végére értél! Sikerült 85%-os pontosság felett teljesítened!
+  </p>
+  <p>
+    Ha szeretnél, nyugodtan tarts egy rövid, 1-2 perces szünetet!
+  </p>
+  <p>
+    Emlékeztető a billentyűkhöz: 1 billentyű -> F, 2 billentyű -> H, 8 billentyű -> N, 9 billentyű -> P.
+  </p>
+  Nyomd meg a Space billentyűt a folytatáshoz!
+  </div>
+  `,
+  choices: [" "],
+  post_trial_gap: 0,
+  data: {
+    task: 'pause_practice'
+  },
+  save_trial_parameters: {
+    stimulus: false
+  }
 }
 
 var test = {
@@ -356,11 +440,22 @@ var feedback = {
       if(last_trial_correct){
         return "<p></p>"; 
       } else {
-        return "<p>Incorrect / No response detected</p>";
+        return "<p>Helytelen / Nincs válasz</p>";
       }
+  },
+  data: {
+    task: 'feedback'
+  },
+  save_trial_parameters: {
+    stimulus: false
   },
   trial_duration: 800,
   response_ends_trial: false,
+}
+
+var procedure_practice ={
+  timeline: [fixation, test, feedback],
+  timeline_variables: practice_stimuli
 }
 
 var procedure_1 = {
@@ -394,8 +489,10 @@ timeline.push(
   fullscreen_trial,
   informedScreen,
   consentScreen,
+  neptun_demographics,
   instructionsScreen,
-  neptun,
+  procedure_practice,
+  pause_practice,
   procedure_1,
   pause,
   procedure_2,
@@ -411,10 +508,11 @@ timeline.push(
   fullscreen_exit_trial
 )
 
-jatos.onLoad(() => {
-  jatos.addAbortButton();
-  jsPsych.run(timeline);
-})
 
+/*jatos.onLoad(
+  jatos.addAbortButton(),
+  jsPsych.run(timeline)
+);*/
+jsPsych.run(timeline)
   </script>
 </html>
